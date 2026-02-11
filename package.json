@@ -1,0 +1,12 @@
+{
+  "name": "careercompas",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "concurrently -k \"python3 -m uvicorn server.main:app --reload --host 0.0.0.0 --port 8000\" \"cd client && npm run dev\"",
+    "server": "python3 -m uvicorn server.main:app --reload --host 0.0.0.0 --port 8000"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}

@@ -1,12 +1,27 @@
 import sqlite3
 import pandas as pd
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
 app = FastAPI()
 
+# Allow the client dev server (Vite) to access this API during development
+origins = [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173"
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 #sqlite connection and cursor creation
-connection = sqlite3.connect('data.db', check_same_thread=False)    
+connection = sqlite3.connect('server/data.db', check_same_thread=False)    
 cursor = connection.cursor()
 
 
@@ -30,5 +45,10 @@ def search_jobs(request: JobSearchRequest):
             result.append(sql_result)
 
     if result:
-        combined_result = pd.concat(result, ignore_index=True).drop_duplicates(subset=['job_title'])
-        return {"jobs": combined_result.to_dict(orient="records")}
+        skill = pd.concat(result, ignore_index=True).drop_duplicates(subset=['job_title'])
+        return skill.to_dict(orient='records')
+@app.get("/all_jobs")
+def get_all_jobs():
+    query = "SELECT * FROM jobs_table"
+    sql_result = pd.read_sql_query(query, connection)
+    return sql_result.to_dict(orient='records')     

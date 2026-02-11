@@ -1,2 +1,14 @@
 /server/.venv
 /server/__pycache__
+node_modules
+client/node_modules
+client/dist
+client/.env
+client/.env.local
+client/.env.development
+client/.env.production
+client/.env.test
+client/.DS_Store
+
+
+            
