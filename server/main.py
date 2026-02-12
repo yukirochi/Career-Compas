@@ -21,8 +21,9 @@ app.add_middleware(
 )
 
 #sqlite connection and cursor creation
-connection = sqlite3.connect('server/data.db', check_same_thread=False)    
+connection = sqlite3.connect('server/job_list.db', check_same_thread=False)    
 cursor = connection.cursor()
+
 
 
 class JobSearchRequest(BaseModel):
@@ -39,7 +40,7 @@ def search_jobs(request: JobSearchRequest):
     result = []
     
     for skill in input_split:
-        query = "SELECT * FROM jobs_table WHERE required_skills LIKE ?"
+        query = "SELECT * FROM job_list WHERE required_skills LIKE ?"
         sql_result = pd.read_sql_query(query, connection, params=(f'%{skill}%',))
         if not sql_result.empty:
             result.append(sql_result)
@@ -49,6 +50,6 @@ def search_jobs(request: JobSearchRequest):
         return skill.to_dict(orient='records')
 @app.get("/all_jobs")
 def get_all_jobs():
-    query = "SELECT * FROM jobs_table"
+    query = "SELECT * FROM job_list"
     sql_result = pd.read_sql_query(query, connection)
     return sql_result.to_dict(orient='records')     
