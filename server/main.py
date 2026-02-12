@@ -8,7 +8,7 @@ app = FastAPI()
 
 # Allow the client dev server (Vite) to access this API during development
 origins = [
-    "https://career-compas-5ty7.vercel.app/",
+    "https://career-compas-5ty7.vercel.app",
     'http://localhost:5173',
 ]
 
