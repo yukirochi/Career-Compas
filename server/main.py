@@ -8,13 +8,13 @@ app = FastAPI()
 
 # Allow the client dev server (Vite) to access this API during development
 origins = [
-    "https://career-compas-5ty7.vercel.app",
+    "https://career-compas-5ty7.vercel.app/",
     'http://localhost:5173',
 ]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,           # Allow your specific URLs
+    allow_origins=["*"],           # Allow your specific URLs
     allow_credentials=True,
     allow_methods=["*"],             # Allow all HTTP methods (GET, POST, etc.)
     allow_headers=["*"],             # Allow all headers
