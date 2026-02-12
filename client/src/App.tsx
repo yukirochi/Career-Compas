@@ -23,6 +23,7 @@ import {
   Layers,
   Milestone
 } from 'lucide-react';
+const baseurl = 'https://career-compas.onrender.com/'
 
 /**
  * ARCHITECTURAL SPECIFICATIONS:
@@ -239,7 +240,7 @@ export default function App() {
   const fetchJobs = async () => {
     setLoading(true);
     try {
-      const res = await fetch(`http://localhost:8000/all_jobs`);
+      const res = await fetch(`${baseurl}all_jobs`);
       if (!res.ok) throw new Error("Backend offline");
       const data = await res.json();
       
@@ -290,7 +291,7 @@ export default function App() {
     setActiveIndex(-1);
 
     try {
-      const res = await fetch("http://localhost:8000/search_jobs", {
+      const res = await fetch(`${baseurl}search_jobs`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ skill: trimmedQuery })
