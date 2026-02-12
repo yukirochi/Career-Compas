@@ -21,7 +21,7 @@ app.add_middleware(
 )
 
 #sqlite connection and cursor creation
-connection = sqlite3.connect('server/job_list.db', check_same_thread=False)    
+connection = sqlite3.connect('job_list.db', check_same_thread=False)    
 cursor = connection.cursor()
 
 
