@@ -6,18 +6,16 @@ from pydantic import BaseModel
 
 app = FastAPI()
 
-# Allow the client dev server (Vite) to access this API during development
 origins = [
-    "https://career-compas-5ty7.vercel.app/",
     'http://localhost:5173',
 ]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],           # Allow your specific URLs
+    allow_origins=["*"],           
     allow_credentials=True,
-    allow_methods=["*"],             # Allow all HTTP methods (GET, POST, etc.)
-    allow_headers=["*"],             # Allow all headers
+    allow_methods=["*"],             
+    allow_headers=["*"],            
 )
 
 #sqlite connection and cursor creation
@@ -35,21 +33,35 @@ def read_root():
 
 @app.post("/search_jobs")
 def search_jobs(request: JobSearchRequest):
-    input_skill = request.skill.lower().strip()
+    input_skill = request.skill.lower().strip().replace('|'," ").replace(","," ").replace("-"," ")
     input_split = input_skill.split()
-    result = []
+    phrases = []
     
-    for skill in input_split:
-        query = "SELECT * FROM job_list WHERE required_skills LIKE ?"
-        sql_result = pd.read_sql_query(query, connection, params=(f'%{skill}%',))
-        if not sql_result.empty:
-            result.append(sql_result)
+    limit = min(len(input_split), 3)
+    
+    for x in range(1, limit + 1):
+        for i in range(len(input_split) - x + 1):
+            phrase = " ".join(input_split[i:i + x])
+            phrases.append(f"|{phrase}|")
+    def search_to_sql(table_column):
+        conditions = []  
+        for res in phrases:
+            conditions.append(f" {table_column} LIKE '%{res}%'")
 
-    if result:
-        skill = pd.concat(result, ignore_index=True).drop_duplicates(subset=['job_title'])
-        return skill.to_dict(orient='records')
-@app.get("/all_jobs")
+        where_clause = " OR ".join(conditions)   
+        query = f"SELECT * FROM job_list WHERE {where_clause}"  
+        sql_res = pd.read_sql_query(query, connection)
+        return sql_res.to_dict(orient='records')
+    
+    search_results = []
+    for col in ['required_skills', 'tools_used', 'related_words']:
+        search_results += search_to_sql(col)
+
+    return search_results
+
+@app.get("/all_jobs")   
 def get_all_jobs():
     query = "SELECT * FROM job_list"
     sql_result = pd.read_sql_query(query, connection)
     return sql_result.to_dict(orient='records')     
+
